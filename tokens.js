@@ -1,9 +1,11 @@
 const { sign } = require("jsonwebtoken");
 
-const createAccessToken = (userId) => {
+const createAccessToken = (userId, name, type) => {
   return sign(
     {
       userId,
+      name,
+      type,
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
@@ -23,10 +25,12 @@ const createRefreshToken = (userId) => {
   );
 };
 
-const sendAccessToken = (res, req, accesstoken) => {
+const sendAccessToken = (res, req, accesstoken, name, type) => {
   res.send({
     accesstoken,
     email: req.body.email,
+    name,
+    type,
   });
 };
 

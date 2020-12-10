@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { UserContext } from "../App";
+import UserSettings from "./UserSettings";
 
 const Protected = () => {
   const [user] = useContext(UserContext);
@@ -21,7 +22,27 @@ const Protected = () => {
     fetchProtected();
   }, [user]);
 
-  return <div>{content}</div>;
+  const contentCompiler = () => {
+    if (user.accesstoken === "") return <h2>You need to login!</h2>;
+    if (user.type === 2) {
+      return (
+        <div>
+          <UserSettings />
+          <UserSettings />
+          <UserSettings />
+        </div>
+      );
+    } else {
+      return <h2>You are not an admin!</h2>;
+    }
+  };
+
+  return (
+    <div>
+      {content}
+      {contentCompiler()}
+    </div>
+  );
 };
 
 export default Protected;

@@ -26,6 +26,8 @@ const Login = () => {
     if (result.accesstoken) {
       setuser({
         accesstoken: result.accesstoken,
+        name: result.name,
+        type: result.type,
       });
       navigate("/");
     } else {

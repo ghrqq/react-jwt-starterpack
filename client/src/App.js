@@ -41,6 +41,8 @@ function App() {
       ).json();
       setuser({
         accesstoken: result.accesstoken,
+        name: result.name,
+        type: result.type,
       });
       setloading(false);
     }
@@ -60,6 +62,9 @@ function App() {
           <Content path="/" />
         </Router>
       </div>
+
+      {user.name}
+      {user.type}
     </UserContext.Provider>
   );
 }

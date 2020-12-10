@@ -5,8 +5,10 @@ const isAuth = (req) => {
   if (!authorization) throw new Error("You need to login");
   // 'Bearer actualtoken'
   const token = authorization.split(" ")[1];
-  const { userId } = verify(token, process.env.ACCESS_TOKEN_SECRET);
-  return userId;
+
+  const { userId, name, type } = verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+  return { userId, name, type };
 };
 
 module.exports = {

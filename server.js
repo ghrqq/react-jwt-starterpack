@@ -86,7 +86,7 @@ app.post("/login", async (req, res) => {
     const valid = await compare(password, user.password);
     if (!valid) throw new Error("Password is not correct.");
     // 3. Create a refresh and accesstoken
-    const accesstoken = createAccessToken(user.id);
+    const accesstoken = createAccessToken(user.id, user.name, user.type);
     const refreshtoken = createRefreshToken(user.id);
     // Versions of tokens???
 
@@ -96,7 +96,7 @@ app.post("/login", async (req, res) => {
 
     // 5. Send tokens. Refresh token as a cookie and accesstoken as a regular response
     sendRefreshToken(res, refreshtoken);
-    sendAccessToken(res, req, accesstoken);
+    sendAccessToken(res, req, accesstoken, user.name, user.type);
   } catch (err) {
     res.send({
       error: `${err.message}`,
@@ -116,10 +116,48 @@ app.post("/logout", (_req, res) => {
 // 4. Protected route
 app.post("/protected", async (req, res) => {
   try {
-    const userId = isAuth(req);
-    if (userId !== null) {
+    const userDetail = isAuth(req);
+    console.log("userId: ", userDetail.userId);
+
+    // if (userDetail.userId !== null) {
+    //   res.send({
+    //     data: "This is protected data.",
+    //   });
+    // }
+
+    if (userDetail.type === 2) {
       res.send({
-        data: "This is protected data.",
+        data: "You are an admin.",
+      });
+    } else {
+      res.send({
+        data: "Welcome user.",
+      });
+    }
+  } catch (err) {
+    res.send({
+      error: `${err.message}`,
+    });
+  }
+});
+app.post("/protected-admin", async (req, res) => {
+  try {
+    const userDetail = isAuth(req);
+    console.log("userId: ", userDetail.userId);
+
+    // if (userDetail.userId !== null) {
+    //   res.send({
+    //     data: "This is protected data.",
+    //   });
+    // }
+
+    if (userDetail.type === 2) {
+      res.send({
+        data: "Congratulations for making this far!",
+      });
+    } else {
+      res.send({
+        data: "You are not allowed to see this.",
       });
     }
   } catch (err) {
@@ -156,15 +194,22 @@ app.post("/refresh_token", (req, res) => {
     return res.send({ accesstoken: "" });
   }
 
+  console.log("refresh_token user: ", user);
+
   // If token exists, create new Refresh token and Access token
 
-  const accesstoken = createAccessToken(user.id);
+  const accesstoken = createAccessToken(user.id, user.name, user.type);
   const refreshtoken = createRefreshToken(user.id);
   user.refreshtoken = refreshtoken;
 
   // If everything ok, send new refreshtoken and accesstoken
   sendRefreshToken(res, refreshtoken);
-  return res.send({ accesstoken });
+  return res.send({
+    accesstoken,
+    userId: user.id,
+    name: user.name,
+    type: user.type,
+  });
 });
 
 app.listen(process.env.PORT, () =>
